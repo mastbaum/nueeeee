@@ -1,7 +1,9 @@
 #include <iostream>
 #include <vector>
 #include <TH2D.h>
+#include <TFile.h>
 #include <json/json.h>
+#include <TTree.h>
 #include "gallery/ValidHandle.h"
 #include "canvas/Utilities/InputTag.h"
 #include "nusimdata/SimulationBase/MCTruth.h"

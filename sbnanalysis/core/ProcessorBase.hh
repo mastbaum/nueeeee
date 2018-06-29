@@ -11,6 +11,7 @@
 
 #include <string>
 #include <vector>
+#include <TTree.h>
 #include "gallery/Event.h"
 #include "Loader.hh"
 

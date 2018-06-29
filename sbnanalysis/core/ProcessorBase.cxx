@@ -8,7 +8,7 @@
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "nusimdata/SimulationBase/MCNeutrino.h"
 #include "nusimdata/SimulationBase/GTruth.h"
-#include "larsim/EventWeight/Base/MCEventWeight.h"
+#include "uboone/EventWeight/MCEventWeight.h"
 #include "json/json.h"
 #include "Event.hh"
 #include "Loader.hh"

@@ -15,6 +15,7 @@ include_directories($ENV{LARDATAOBJ_INC})
 include_directories($ENV{NUSIMDATA_INC})
 include_directories($ENV{JSONCPP_INC})
 include_directories($ENV{LARSIM_INC})
+include_directories($ENV{UBOONECODE_INC})
 
 link_directories(
   $ENV{CANVAS_LIB}
@@ -25,12 +26,13 @@ link_directories(
   $ENV{LARDATAOBJ_LIB}
   $ENV{JSONCPP_LIB}
   $ENV{LARSIM_LIB}
+  $ENV{UBOONECODE_LIB}
 )
 
 ROOT_GENERATE_DICTIONARY(sbn_eventdict Event.hh LINKDEF linkdef.h)
 
-find_library(LARSIM_BASE_LIBRARY larsim_EventWeight_Base HINTS $ENV{LARSIM_LIB})
-find_library(LARSIM_BASE_DICT larsim_EventWeight_Base_dict HINTS $ENV{LARSIM_LIB})
+find_library(LARSIM_BASE_LIBRARY EventWeight HINTS $ENV{UBOONECODE_LIB})
+find_library(LARSIM_BASE_DICT uboone_EventWeight_dict HINTS $ENV{UBOONECODE_LIB})
 
 add_library(sbnanalysis_Event sbn_eventdict.cxx)
 target_link_libraries(
@@ -44,21 +46,23 @@ add_library(sbnanalysis_Processor SHARED ProcessorBase.cxx SelectionBase.cxx Pro
 target_link_libraries(
   sbnanalysis_Processor
   sbnanalysis_Event
-  canvas
-  cetlib
   gallery
   nusimdata_SimulationBase
   larcoreobj_SummaryData
   lardataobj_RecoBase
+  canvas_Utilities
+  canvas_Persistency_Common
+  canvas_Persistency_Provenance
+  cetlib
   ${LARSIM_BASE_LIBRARY}
   ${LARSIM_BASE_DICT}
   ${ROOT_LIBRARIES}
 )
 
 file(MAKE_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib)
-add_custom_command(TARGET sbnanalysis_Event POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different
-  libsbn_eventdict_rdict.pcm ${CMAKE_INSTALL_PREFIX}/lib)
+#add_custom_command(TARGET sbnanalysis_Event POST_BUILD
+#  COMMAND ${CMAKE_COMMAND} -E copy_if_different
+#  libsbn_eventdict_rdict.pcm ${CMAKE_INSTALL_PREFIX}/lib)
 
 add_executable(sbn sbn.cxx)
 target_link_libraries(
@@ -66,9 +70,6 @@ target_link_libraries(
   sbnanalysis_Processor
   sbnanalysis_Event
   jsoncpp
-  ${LARSIM_BASE_LIBRARY}
-  ${LARSIM_BASE_DICT}
-  ${ROOT_LIBRARIES}
 )
 
 install(TARGETS sbnanalysis_Event DESTINATION lib)
