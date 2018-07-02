@@ -80,7 +80,7 @@ bool Pandora_VtxingSelection::ProcessEvent(gallery::Event& ev) {
   // Fill in the custom branches
   fNuCount = mctruths.size();  // Number of neutrinos in this event
  
-  if(fNuCount > 1) continue; 
+  if(fNuCount > 1) return false; 
 
   // Iterate through the neutrinos
   for (size_t i=0; i<mctruths.size(); i++) {
