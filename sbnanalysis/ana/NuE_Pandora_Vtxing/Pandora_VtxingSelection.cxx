@@ -1,9 +1,11 @@
+#include <cassert>
 #include <iostream>
 #include <vector>
 #include <TH2D.h>
 #include <json/json.h>
 #include "gallery/ValidHandle.h"
 #include "canvas/Utilities/InputTag.h"
+#include "nusimdata/SimulationBase/MCFlux.h"
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "nusimdata/SimulationBase/MCNeutrino.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
@@ -19,16 +21,16 @@ Pandora_VtxingSelection::Pandora_VtxingSelection() : SelectionBase(), fNuCount(0
 
 
 void Pandora_VtxingSelection::Initialize(Json::Value* config) {
-  // Make a histogram
-  
   // Load configuration parameters
   fTruthTag = { "generator" };
+  fFluxTag = { "generator" };
   fPandoraTag = { "pandoraNu" };
 
-  //  if (config) {
-  //  fMyParam = (*config)["NuE_Pandora_Vtxing"].get("parameter", 0).asInt();
-  //  fTruthTag = { (*config)["NuE_Pandora_Vtxing"].get("MCTruthTag", "generator").asString() };
-  //}
+  if (config) {
+    fTruthTag = { (*config)["NuE_Pandora_Vtxing"].get("MCTruthTag", fTruthTag.label()).asString() };
+    fFluxTag = { (*config)["NuE_Pandora_Vtxing"].get("MCFluxTag", fFluxTag.label()).asString() };
+    fPandoraTag = { (*config)["NuE_Pandora_Vtxing"].get("PandoraTag", fPandoraTag.label()).asString() };
+  }
 
   // Add custom branches
   AddBranch("isAV", &fAV);
@@ -41,6 +43,9 @@ void Pandora_VtxingSelection::Initialize(Json::Value* config) {
   AddBranch("LpE", &fLpE); // GeV
   AddBranch("piMult", &fpiMult);
   //  AddBranch("nuParPdg", &fnuParPdg);
+
+  AddBranch("pType", &fptype);
+  AddBranch("intMode", &fintMode);
 
   AddBranch("mc_vtx_x", &fmc_vtx_x);
   AddBranch("mc_vtx_y", &fmc_vtx_y);
@@ -55,14 +60,11 @@ void Pandora_VtxingSelection::Initialize(Json::Value* config) {
   AddBranch("min_vtx_z", &fmin_vtx_z);
 
   AddBranch("min_dist", &fmin_dist);
-    
 }
 
 
 void Pandora_VtxingSelection::Finalize() {
-  // Output our histograms to the ROOT file
   fOutputFile->cd();
-
 }
 
 
@@ -73,14 +75,18 @@ bool Pandora_VtxingSelection::ProcessEvent(gallery::Event& ev) {
   fEventCounter++;
  
   // Grab a data product from the event
-  auto const& mctruths = *ev.getValidHandle<std::vector<simb::MCTruth>>(fTruthTag);
-  //auto const& mcfluxs = *ev.getValidHandle<std::vector<simb::MCTruth>>(fTruthTag);
-  auto const& vtxs = *ev.getValidHandle<std::vector<recob::Vertex>>(fPandoraTag);
+  auto const& mctruths = *ev.getValidHandle<std::vector<simb::MCTruth> >(fTruthTag);
+  auto const& mcfluxs = *ev.getValidHandle<std::vector<simb::MCFlux> >(fFluxTag);
+  auto const& vtxs = *ev.getValidHandle<std::vector<recob::Vertex> >(fPandoraTag);
 
   // Fill in the custom branches
   fNuCount = mctruths.size();  // Number of neutrinos in this event
  
-  if(fNuCount > 1) continue; 
+  if (fNuCount > 1) {
+    return false;
+  }
+
+  assert(mctruths.size() == mcfluxs.size());
 
   // Iterate through the neutrinos
   for (size_t i=0; i<mctruths.size(); i++) {
@@ -88,6 +94,10 @@ bool Pandora_VtxingSelection::ProcessEvent(gallery::Event& ev) {
     auto const& mcnu    = mctruth.GetNeutrino(); //!< this is the MCNu
     auto const& nu      = mctruth.GetNeutrino().Nu(); //!< this is the MCParitcle
     auto const& lep     = mctruth.GetNeutrino().Lepton(); //!< this is the MCParitcle
+    auto const& mcflux  = mcfluxs.at(i);
+
+    fintMode = mctruth.GetNeutrino().Mode();
+    fptype = mcflux.fptype;
     
     fAV = isAV(nu.EndX(),nu.EndY(),nu.EndZ());
 
@@ -139,11 +149,13 @@ bool Pandora_VtxingSelection::ProcessEvent(gallery::Event& ev) {
 
   for (size_t i=0; i<vtxs.size(); i++) {
     
-    auto const& vtx = vtxs.at(i);
+    recob::Vertex vtx = vtxs.at(i);
     
     //FIXME: Add dist to mc calc 
     
-    auto const& v = vtx.position();
+    double va[3];
+    vtx.XYZ(va);
+    TVector3 v(va);
 
     std::cout << "reco v " << i << " x :  "<< v.x() << " y : " << v.y() << " z : " << v.z() << std::endl;
 

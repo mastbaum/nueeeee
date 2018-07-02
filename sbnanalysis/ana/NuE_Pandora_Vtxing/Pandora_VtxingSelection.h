@@ -71,6 +71,7 @@ protected:
 
   /** Configuration parameters */
   art::InputTag fTruthTag;  //!< art tag for MCTruth information
+  art::InputTag fFluxTag;  //!< art tag for MCFlux information
   art::InputTag fPandoraTag;  //!< art tag for MCTruth information
 
   /** Custom data branches */
@@ -83,6 +84,10 @@ protected:
   int fpMult;
   double fLpE;
   int fpiMult;
+
+  int fptype;  //!< Flux parent type
+  int fintMode;  //!< LArSoft interaction code
+
   double fmc_vtx_x;
   double fmc_vtx_y;
   double fmc_vtx_z;

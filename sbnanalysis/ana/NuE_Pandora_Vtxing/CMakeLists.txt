@@ -13,9 +13,17 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(sbnanalysis_NuE_Pandora_Vtxing_Pandora_VtxingTools SHARED Pandora_VtxingTools.cxx)
 add_library(sbnanalysis_NuE_Pandora_Vtxing_Pandora_VtxingSelection SHARED Pandora_VtxingSelection.cxx)
 add_library(sbnanalysis_NuE_Pandora_Vtxing_SpaceChargeMicroBooNE SHARED SpaceChargeMicroBooNE.C)
+
 # Define library linking
-target_link_libraries(sbnanalysis_NuE_Pandora_Vtxing_Pandora_VtxingSelection sbnanalysis_NuE_Pandora_Vtxing_Pandora_VtxingTools)
-target_link_libraries(sbnanalysis_NuE_Pandora_Vtxing_Pandora_VtxingSelection sbnanalysis_NuE_Pandora_Vtxing_SpaceChargeMicroBooNE)
+target_link_libraries(
+  sbnanalysis_NuE_Pandora_Vtxing_Pandora_VtxingSelection
+  sbnanalysis_NuE_Pandora_Vtxing_Pandora_VtxingTools
+  jsoncpp)
+
+target_link_libraries(
+  sbnanalysis_NuE_Pandora_Vtxing_Pandora_VtxingSelection
+  sbnanalysis_NuE_Pandora_Vtxing_SpaceChargeMicroBooNE
+)
 
 # Install all libraries to the main "lib" directory
 install(TARGETS sbnanalysis_NuE_Pandora_Vtxing_Pandora_VtxingTools DESTINATION lib)
