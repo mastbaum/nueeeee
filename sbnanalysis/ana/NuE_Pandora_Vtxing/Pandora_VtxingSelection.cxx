@@ -31,6 +31,7 @@ void Pandora_VtxingSelection::Initialize(Json::Value* config) {
   //}
 
   // Add custom branches
+  AddBranch("isAV", &fAV);
   AddBranch("nucount", &fNuCount);
   AddBranch("nuCC", &fnuCC);
   AddBranch("nuPdg", &fnuPdg);
@@ -78,7 +79,9 @@ bool Pandora_VtxingSelection::ProcessEvent(gallery::Event& ev) {
 
   // Fill in the custom branches
   fNuCount = mctruths.size();  // Number of neutrinos in this event
-    
+ 
+  if(fNuCount > 1) continue; 
+
   // Iterate through the neutrinos
   for (size_t i=0; i<mctruths.size(); i++) {
     auto const& mctruth = mctruths.at(i);
@@ -86,7 +89,7 @@ bool Pandora_VtxingSelection::ProcessEvent(gallery::Event& ev) {
     auto const& nu      = mctruth.GetNeutrino().Nu(); //!< this is the MCParitcle
     auto const& lep     = mctruth.GetNeutrino().Lepton(); //!< this is the MCParitcle
     
-     if(!(isAV(nu.EndX(),nu.EndY(),nu.EndZ()))) continue;
+    fAV = isAV(nu.EndX(),nu.EndY(),nu.EndZ());
 
     // Fill neutrino vertex positions
     fnuCC  = abs( mcnu.CCNC() -1);

@@ -76,6 +76,7 @@ protected:
   /** Custom data branches */
   int fNuCount;  //!< Number of neutrino interactions in the event
   int fnuCC;
+  int fAV;
   int fnuPdg;
   double fEnu;
   double fElep;
