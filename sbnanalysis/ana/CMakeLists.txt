@@ -21,6 +21,5 @@ link_directories(
   ${CMAKE_INSTALL_DIR}/lib
 )
 
-add_subdirectory(ExampleAnalysis)
-add_subdirectory(SBNProposal)
+add_subdirectory(NuE_Pandora_Vtxing)
 

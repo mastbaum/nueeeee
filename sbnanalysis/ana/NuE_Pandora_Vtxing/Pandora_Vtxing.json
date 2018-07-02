@@ -1,0 +1,7 @@
+{
+  "OutputFile": "output.root",
+  "Pandora_Vtxing": {
+    "parameter": 42
+  }
+}
+
