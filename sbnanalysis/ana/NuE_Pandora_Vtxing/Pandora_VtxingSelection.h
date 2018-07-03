@@ -72,7 +72,8 @@ protected:
   /** Configuration parameters */
   art::InputTag fTruthTag;  //!< art tag for MCTruth information
   art::InputTag fFluxTag;  //!< art tag for MCFlux information
-  art::InputTag fPandoraTag;  //!< art tag for MCTruth information
+  art::InputTag fPandoraTag;  //!< art tag for Pandora information
+  art::InputTag fFlashTag;  //!< art tag for Flash information
 
   /** Custom data branches */
   int fNuCount;  //!< Number of neutrino interactions in the event
@@ -100,6 +101,10 @@ protected:
   double fmin_vtx_y;
   double fmin_vtx_z;
   double fmin_dist;
+
+  double fbeam_flash_T;
+  double fbeam_flash_absT;
+  double fbeam_flash_onbeamT;
 
   /** Histograms */
 

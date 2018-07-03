@@ -9,6 +9,7 @@
 #include "nusimdata/SimulationBase/MCTruth.h"
 #include "nusimdata/SimulationBase/MCNeutrino.h"
 #include "nusimdata/SimulationBase/MCParticle.h"
+#include "lardataobj/RecoBase/OpFlash.h"
 #include "lardataobj/RecoBase/Vertex.h"
 #include "Pandora_VtxingTools.h"
 #include "Pandora_VtxingSelection.h"
@@ -22,9 +23,10 @@ Pandora_VtxingSelection::Pandora_VtxingSelection() : SelectionBase(), fNuCount(0
 
 void Pandora_VtxingSelection::Initialize(Json::Value* config) {
   // Load configuration parameters
-  fTruthTag = { "generator" };
-  fFluxTag = { "generator" };
+  fTruthTag =   { "generator" };
+  fFluxTag =    { "generator" };
   fPandoraTag = { "pandoraNu" };
+  fFlashTag =   {"simpleFlashBeam"};
 
   if (config) {
     fTruthTag = { (*config)["NuE_Pandora_Vtxing"].get("MCTruthTag", fTruthTag.label()).asString() };
@@ -60,6 +62,11 @@ void Pandora_VtxingSelection::Initialize(Json::Value* config) {
   AddBranch("min_vtx_z", &fmin_vtx_z);
 
   AddBranch("min_dist", &fmin_dist);
+
+  AddBranch("beam_flash_T", &fbeam_flash_T);
+  AddBranch("beam_flash_absT", &fbeam_flash_absT);
+  AddBranch("beam_flash_onbeamT", &fbeam_flash_onbeamT);
+
 }
 
 
@@ -78,6 +85,8 @@ bool Pandora_VtxingSelection::ProcessEvent(gallery::Event& ev) {
   auto const& mctruths = *ev.getValidHandle<std::vector<simb::MCTruth> >(fTruthTag);
   auto const& mcfluxs = *ev.getValidHandle<std::vector<simb::MCFlux> >(fFluxTag);
   auto const& vtxs = *ev.getValidHandle<std::vector<recob::Vertex> >(fPandoraTag);
+  auto const& flashs = *ev.getValidHandle<std::vector<recob::OpFlash> >(fFlashTag);
+
 
   // Fill in the custom branches
   fNuCount = mctruths.size();  // Number of neutrinos in this event
@@ -172,6 +181,17 @@ bool Pandora_VtxingSelection::ProcessEvent(gallery::Event& ev) {
       fmin_dist  = dist;    
     }       
   }
+
+  for (size_t i=0; i<flashs.size(); i++){
+
+    recob::OpFlash f = flashs.at(i);
+
+    fbeam_flash_T       = f.Time();
+    fbeam_flash_absT    = f.AbsTime();
+    fbeam_flash_onbeamT = f.OnBeamTime();
+
+    }
+
   
   return true;
 }
