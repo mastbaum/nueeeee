@@ -74,6 +74,7 @@ protected:
   art::InputTag fFluxTag;  //!< art tag for MCFlux information
   art::InputTag fPandoraTag;  //!< art tag for Pandora information
   art::InputTag fFlashTag;  //!< art tag for Flash information
+  art::InputTag fTriggerTag;
 
   /** Custom data branches */
   int fNuCount;  //!< Number of neutrino interactions in the event
@@ -105,6 +106,10 @@ protected:
   double fbeam_flash_T;
   double fbeam_flash_absT;
   double fbeam_flash_onbeamT;
+
+  int fnumuInc_Selected;
+
+  bool fUseTrigger;
 
   /** Histograms */
 

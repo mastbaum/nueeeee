@@ -13,6 +13,7 @@
 #include "lardataobj/RecoBase/Vertex.h"
 #include "Pandora_VtxingTools.h"
 #include "Pandora_VtxingSelection.h"
+#include "canvas/Persistency/Common/TriggerResults.h"
 
 
 namespace ana {
@@ -27,11 +28,11 @@ void Pandora_VtxingSelection::Initialize(Json::Value* config) {
   fFluxTag =    { "generator" };
   fPandoraTag = { "pandoraNu" };
   fFlashTag =   {"simpleFlashBeam"};
+  fTriggerTag = {"TriggerResults::UBXSec"};
+  fUseTrigger = false;
 
   if (config) {
-    fTruthTag = { (*config)["NuE_Pandora_Vtxing"].get("MCTruthTag", fTruthTag.label()).asString() };
-    fFluxTag = { (*config)["NuE_Pandora_Vtxing"].get("MCFluxTag", fFluxTag.label()).asString() };
-    fPandoraTag = { (*config)["NuE_Pandora_Vtxing"].get("PandoraTag", fPandoraTag.label()).asString() };
+    fUseTrigger = { (*config)["NuE_Pandora_Vtxing"].get("UseTrigger", false).asBool() };    
   }
 
   // Add custom branches
@@ -67,6 +68,9 @@ void Pandora_VtxingSelection::Initialize(Json::Value* config) {
   AddBranch("beam_flash_absT", &fbeam_flash_absT);
   AddBranch("beam_flash_onbeamT", &fbeam_flash_onbeamT);
 
+  if(fUseTrigger){
+    AddBranch("numuInc_Selected", &fnumuInc_Selected);
+  }
 }
 
 
@@ -88,12 +92,20 @@ bool Pandora_VtxingSelection::ProcessEvent(gallery::Event& ev) {
   auto const& flashs = *ev.getValidHandle<std::vector<recob::OpFlash> >(fFlashTag);
 
 
+
   // Fill in the custom branches
   fNuCount = mctruths.size();  // Number of neutrinos in this event
  
   if (fNuCount > 1) {
     return false;
   }
+
+  //Check if event passed a selection
+  if(fUseTrigger){
+    auto const & trig = *(ev.getValidHandle< art::TriggerResults >(fTriggerTag));
+    fnumuInc_Selected = trig.accept(); 
+  }
+
 
   assert(mctruths.size() == mcfluxs.size());
 
