@@ -10,6 +10,8 @@
 #include <iostream>
 #include <cassert>
 
+#include <TFile.h>
+#include <TTree.h>
 #include <TH2D.h>
 
 class TTree;
@@ -25,7 +27,12 @@ class EventSample {
         EventSample(std::vector<std::string> filenames, float fScaleFactor);
         
         // My own... (Added two new public members: string for detector and string for description of sample)
-        EventSample(TTree* _tree, float ScaleFactor, std::string Det, std::string Desc) : tree(_tree), fScaleFactor(ScaleFactor), sDet(Det), sDesc(Desc) {
+        EventSample(TFile* f, float ScaleFactor, std::string Det, std::string Desc) : fFile(f), fScaleFactor(ScaleFactor), sDet(Det), sDesc(Desc) {
+
+            assert(f && f->IsOpen());
+            fFile = f;
+            tree = dynamic_cast<TTree*>(f->Get("sbnana"));
+            assert(tree);
 
             // Detector
             if (Det == "sbnd") {
@@ -49,6 +56,7 @@ class EventSample {
 
         }
 
+        TFile* fFile;  //!< File containing the event tree
         TTree* tree;            //!< Event tree
         float fScaleFactor;     //!< Factor for POT (etc.) scaling
         std::string sDet;       // What detector it comes from

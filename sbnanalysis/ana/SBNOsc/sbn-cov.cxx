@@ -36,9 +36,10 @@ int main(int argc, char* argv[]) {
         std::string det = detlist[d], DET = DETLIST[d], desc = desclist[d];
         float scale = scalelist[d];
         
-        TFile f(((std::string)"/sbnd/data/users/gavarela/selection/new/output_" + DET + (std::string)".root").c_str());
+        TFile* f = TFile::Open(((std::string)"/sbnd/data/users/gavarela/selection/new/output_" + DET + (std::string)".root").c_str());
+        assert(f && f->IsOpen());
         
-        samples.push_back(ana::SBNOsc::EventSample((TTree*)f.Get("sbnana"), scale, det, desc));
+        samples.push_back(ana::SBNOsc::EventSample(f, scale, det, desc));
         
     }
     
